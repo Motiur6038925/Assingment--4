@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+  <style>
+    .container {
+      padding: 20px;
+    }
+
+    #shopping-cart {
+      margin-top: 20px;
+    }
+
+    .product {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .product-name {
+      font-weight: bold;
+    }
+
+    .product-price {
+      margin-left: 10px;
+    }
+
+    .product-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .cart-item {
+      margin-bottom: 10px;
+    }
+
+    .cart-item-total {
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    #clear-cart {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="product-list"></div>
+    <div id="shopping-cart"></div>
+    <button id="clear-cart" class="btn btn-danger">Clear Cart</button>
+  </div>
+
+  <script>
+    // products array
+    const products = [
+      { id: 1, name: "Mirinda", price: 10, image: "https://w7.pngwing.com/pngs/749/901/png-transparent-fizzy-drinks-pepsi-orange-juice-mirinda-fruit-salad-pepsi-citrus-orange-fruit-salad-thumbnail.png" },
+      { id: 2, name: "Pepsi", price: 15, image: "https://w7.pngwing.com/pngs/674/292/png-transparent-pepsi-soda-bottle-digital-art-pepsi-one-carbonated-water-fizzy-drinks-pizza-pepsi-food-cola-7-up-thumbnail.png" },
+      { id: 3, name: "Cocacola", price: 20, image: "https://w7.pngwing.com/pngs/612/1002/png-transparent-coca-cola-fizzy-drinks-sprite-juice-coca-cola-cola-juice-bottle-thumbnail.png" },
+    ];
+
+    let cart = [];
+
+    // Add item to cart
+    const addItemToCart = (product, quantity) => {
+      const item = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+      };
+
+      cart.push(item);
+    };
+
+    // Remove item from cart
+    const removeItemFromCart = (itemId) => {
+      cart = cart.filter((item) => item.id !== itemId);
+    };
+
+    // Clear the cart
+    const clearCart = () => {
+      cart = [];
+    };
+
+    // Get total cart amount
+    const getTotalAmount = () => {
+      let total = 0;
+      for (const item of cart) {
+        total += item.price * item.quantity;
+      }
+      return total;
+    };
+
+    // Display product list
+    const displayProductList = () => {
+      const productListElement = document.getElementById("product-list");
+
+      for (const product of products) {
+        const productElement = document.createElement("div");
+        productElement.classList.add("product");
+        productElement.innerHTML = `
+          <img src="${product.image}" alt="Product Image" class="product-img">
+          <span class="product-name">${product.name}</span>
+          <span class="product-price">$${product.price}</span>
+          <button class="btn btn-primary add-to-cart" data-product-id="${product.id}">Add to Cart</button>
+        `;
+        productListElement.appendChild(productElement);
+      }
+    };
+
+    // Display cart items
+    const displayCartItems = () => {
+      const shoppingCartElement = document.getElementById("shopping-cart");
+      shoppingCartElement.innerHTML = "";
+
+      for (const item of cart) {
+        const cartItemElement = document.createElement("div");
+        cartItemElement.classList.add("cart-item");
+        cartItemElement.innerHTML = `
+          <span class="item-name">${item.name}</span>
+          <span class="item-quantity">Quantity: ${item.quantity}</span>
+          <span class="item-price">Price: $${item.price}</span>
+          <span class="item-total">Total: $${item.price * item.quantity}</span>
+          <button class="btn btn-danger remove-item" data-item-id="${item.id}">Remove</button>
+        `;
+        shoppingCartElement.appendChild(cartItemElement);
+      }
+
+      const totalAmountElement = document.createElement("div");
+      totalAmountElement.classList.add("cart-item-total");
+      totalAmountElement.textContent = `Total Amount: $${getTotalAmount()}`;
+      shoppingCartElement.appendChild(totalAmountElement);
+
+      addEventListeners();
+    };
+
+    // Add event listeners
+    const addEventListeners = () => {
+      const addToCartButtons = document.getElementsByClassName("add-to-cart");
+      const removeItemButtons = document.getElementsByClassName("remove-item");
+      const clearCartButton = document.getElementById("clear-cart");
+
+      for (const button of addToCartButtons) {
+        button.addEventListener("click", handleAddToCart);
+      }
+
+      for (const button of removeItemButtons) {
+        button.addEventListener("click", handleRemoveItem);
+      }
+
+      clearCartButton.addEventListener("click", handleClearCart);
+    };
+
+    // Event handlers
+    const handleAddToCart = (event) => {
+      const productId = parseInt(event.target.getAttribute("data-product-id"), 10);
+      const product = products.find((product) => product.id === productId);
+      const quantity = 1; // Change this if you want to add a quantity input
+
+      addItemToCart(product, quantity);
+      displayCartItems();
+    };
+
+    const handleRemoveItem = (event) => {
+      const itemId = parseInt(event.target.getAttribute("data-item-id"), 10);
+      removeItemFromCart(itemId);
+      displayCartItems();
+    };
+
+    const handleClearCart = () => {
+      clearCart();
+      displayCartItems();
+    };
+
+    // Initialize the app
+    const init = () => {
+      displayProductList();
+      displayCartItems();
+    };
+
+    // Run the app
+    init();
+  </script>
+</body>
+
+</html>
+
